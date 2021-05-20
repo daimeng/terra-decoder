@@ -3,13 +3,14 @@ const { marshalTx, unmarshalTx, bytesToBase64 } = require('./amino.js');
 // Only marshalTx and umarshalTx tested so far.
 // Other functions seem to have some kind of version mismatch.
 const METHODS = {
-  unmarshalTx(tx, lengthPrefixed = true) {
-    if (tx.hasOwnProperty('result')) {
-      tx.result.txs = tx.result.txs.map(x => unmarshalTx(Buffer.from(x, 'base64'), lengthPrefixed));
-      return tx;
-    } else {
-      return unmarshalTx(Buffer.from(tx, 'base64'), lengthPrefixed);
-    }
+  unmarshalTx(txs, lengthPrefixed = true) {
+    return txs.map(tx => {
+      try {
+        return unmarshalTx(Buffer.from(tx, 'base64'), lengthPrefixed);
+      } catch (e) {
+        console.error(e);
+      }
+    })
   },
   marshalTx(txData, lengthPrefixed = true) {
     return bytesToBase64(marshalTx(JSON.parse(txData), lengthPrefixed));
@@ -23,15 +24,8 @@ function run(cmd, ...args) {
     return 1;
   }
 
-  args = args.map(arg => {
-    try {
-      return JSON.parse(arg);
-    } catch (e) {
-      return arg;
-    }
-  })
   try {
-    const result = fn(...args);
+    const result = fn(args);
     console.log(
       JSON.stringify(result, null, 2)
     );
