@@ -1,3 +1,6 @@
+# Archived
+Use restored fork of amino decoder instead, much faster and less jank: https://github.com/daimeng/amino-decoder/
+
 # Running with docker
 Run on a single Tx base64 string:
 ```shell
